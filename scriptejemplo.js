@@ -1,12 +1,16 @@
 const usuariosDiv = document.getElementById("usuarios");
 
-fetch("https://pokeapi.co/api/v2/pokemon")
+fetch("https://jsonplaceholder.typicode.com/users")
   .then((response) => response.json())
   .then((data) => {
     data.forEach((usuario) => {
-      const p = document.createElement("p");
-      p.textContent = `Nombre: ${usuario.name} - Email: ${usuario.email}`;
-      usuariosDiv.appendChild(p);
+   
+   const 
+   
+   
+     //   const p = document.createElement("p");
+    //  p.textContent = `Nombre: ${usuario.name} - Email: ${usuario.email}`;
+      //usuariosDiv.appendChild(p);
     });
     console.log(data);
   })
