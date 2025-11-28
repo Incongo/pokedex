@@ -1,104 +1,161 @@
-const contenedorPokemon = document.getElementById("pokemons");
-const paginationTop = document.getElementById("pagination-top");
-const paginationBottom = document.getElementById("pagination-bottom");
-const searchInput = document.getElementById("search");
-const searchBtn = document.getElementById("searchBtn");
+async function loadFragment(id, file) {
+  const res = await fetch(file);
+  const html = await res.text();
+  document.getElementById(id).innerHTML = html;
 
-function buscarPokemon() {
-  const nombre = searchInput.value.trim().toLowerCase();
-  if (nombre) {
-    // Redirige a la página dinámica con el parámetro
-    window.location.href = `pokemon.html?name=${nombre}`;
+  if (id === "header") {
+    const searchInput = document.getElementById("search");
+    const searchBtn = document.getElementById("searchBtn");
+
+    function buscarPokemon() {
+      const nombre = (searchInput.value || "").trim().toLowerCase();
+      if (nombre) {
+        window.location.href = `pokemon.html?name=${nombre}`;
+      }
+    }
+
+    searchBtn?.addEventListener("click", buscarPokemon);
+    searchInput?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") buscarPokemon();
+    });
   }
 }
 
-searchBtn.addEventListener("click", buscarPokemon);
-searchInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") buscarPokemon();
-});
+// Cargar header y footer
+loadFragment("header", "header.html");
+loadFragment("footer", "footer.html");
 
-const limit = 20;
-let currentPage = 1;
-let totalPages = 50; // ~1000 pokémon / 20
+document.addEventListener("DOMContentLoaded", () => {
+  const contenedorPokemon = document.getElementById("pokemons");
+  const paginationTop = document.getElementById("pagination-top");
+  const paginationBottom = document.getElementById("pagination-bottom");
 
-async function cargarPokemons(page) {
-  contenedorPokemon.innerHTML = "";
-  currentPage = page;
+  const limit = 20;
+  let currentPage = 1;
+  let totalPages = 1;
 
-  const offset = (page - 1) * limit;
-  const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
+  // Función para obtener la mejor imagen disponible
+  function obtenerImagen(info) {
+    if (info.sprites.other["official-artwork"].front_default) {
+      return info.sprites.other["official-artwork"].front_default;
+    } else if (info.sprites.other["dream_world"].front_default) {
+      return info.sprites.other["dream_world"].front_default;
+    } else {
+      return info.sprites.front_default;
+    }
+  }
 
-  const response = await fetch(url);
-  const data = await response.json();
+  // Función para capitalizar nombre
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
-  for (const pokemon of data.results) {
-    const res = await fetch(pokemon.url);
-    const info = await res.json();
+  // Crear tarjeta estilo carta coleccionable
+
+  function crearTarjeta(info) {
+    const tipoPrincipal = info.types?.[0]?.type?.name || "normal";
+    const imagen = obtenerImagen(info);
+    const claseIcono = `type-icon type-${tipoPrincipal}`;
 
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = `card ${tipoPrincipal}`;
     card.innerHTML = `
-      <h3>${info.name}</h3>
-      <p>Altura: ${info.height}</p>
-      <p>Peso: ${info.weight}</p>
-      <img src="${info.sprites.front_default}" alt="${info.name}">
-    `;
-    contenedorPokemon.appendChild(card);
+    <div class="card-header">
+      <h3>${capitalize(info.name)}</h3>
+    </div>
+    <div class="card-body">
+      <img src="${imagen}" alt="${info.name}">
+    </div>
+    <div class="card-footer">
+      <span class="${claseIcono}"></span>
+      
+    </div>
+  `;
+    card.addEventListener("click", () => {
+      window.location.href = `pokemon.html?name=${info.name}`;
+    });
+    return card;
   }
 
-  renderPagination(paginationTop);
-  renderPagination(paginationBottom);
-}
+  // 👉 Cargar lista de Pokémon con paginación
+  async function cargarPokemons(page = 1) {
+    contenedorPokemon.innerHTML = "";
+    currentPage = page;
 
-function renderPagination(container) {
-  container.innerHTML = "";
+    const offset = (page - 1) * limit;
+    const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
 
-  // Botón Inicio
-  const firstBtn = document.createElement("button");
-  firstBtn.textContent = "Inicio";
-  firstBtn.disabled = currentPage === 1;
-  firstBtn.onclick = () => cargarPokemons(1);
-  container.appendChild(firstBtn);
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
 
-  // Botón anterior
-  const prevBtn = document.createElement("button");
-  prevBtn.textContent = "Anterior";
-  prevBtn.disabled = currentPage === 1;
-  prevBtn.onclick = () => cargarPokemons(currentPage - 1);
-  container.appendChild(prevBtn);
+      if (data.count && data.count > 0) {
+        totalPages = Math.ceil(data.count / limit);
+      }
 
-  // Botones numerados
-  const maxButtons = 5;
-  let start = Math.max(1, currentPage - 2);
-  let end = Math.min(totalPages, start + maxButtons - 1);
+      for (const pokemon of data.results) {
+        const res = await fetch(pokemon.url);
+        const info = await res.json();
+        const card = crearTarjeta(info);
+        contenedorPokemon.appendChild(card);
+      }
 
-  for (let i = start; i <= end; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    if (i === currentPage) {
-      btn.classList.add("active");
+      renderPagination(paginationTop);
+      renderPagination(paginationBottom);
+    } catch (error) {
+      console.error("Error cargando datos:", error);
+      contenedorPokemon.innerHTML = "<p>Error cargando Pokémons.</p>";
     }
-    btn.onclick = () => cargarPokemons(i);
-    container.appendChild(btn);
   }
 
-  // Botón siguiente
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "Siguiente";
-  nextBtn.disabled = currentPage === totalPages;
-  nextBtn.onclick = () => cargarPokemons(currentPage + 1);
-  container.appendChild(nextBtn);
+  // 👉 Renderizar botones de paginación
+  function renderPagination(container) {
+    if (!container) return;
+    container.innerHTML = "";
 
-  // Botón Última
-  const lastBtn = document.createElement("button");
-  lastBtn.textContent = "Última";
-  lastBtn.disabled = currentPage === totalPages;
-  lastBtn.onclick = () => cargarPokemons(totalPages);
-  container.appendChild(lastBtn);
-}
+    const firstBtn = document.createElement("button");
+    firstBtn.textContent = "Inicio";
+    firstBtn.disabled = currentPage === 1;
+    firstBtn.onclick = () => cargarPokemons(1);
+    container.appendChild(firstBtn);
 
-// Primera carga
-cargarPokemons(1);
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "Anterior";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => cargarPokemons(currentPage - 1);
+    container.appendChild(prevBtn);
+
+    const maxButtons = 5;
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + maxButtons - 1);
+    if (end - start + 1 < maxButtons) {
+      start = Math.max(1, end - maxButtons + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      if (i === currentPage) btn.classList.add("active");
+      btn.onclick = () => cargarPokemons(i);
+      container.appendChild(btn);
+    }
+
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Siguiente";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => cargarPokemons(currentPage + 1);
+    container.appendChild(nextBtn);
+
+    const lastBtn = document.createElement("button");
+    lastBtn.textContent = "Última";
+    lastBtn.disabled = currentPage === totalPages;
+    lastBtn.onclick = () => cargarPokemons(totalPages);
+    container.appendChild(lastBtn);
+  }
+
+  // 👉 Cargar primera página al inicio
+  cargarPokemons(1);
+});
 
 // OTRA FORMA DE HACERLO CON PROMESAS
 // fetch("https://pokeapi.co/api/v2/pokemon")
