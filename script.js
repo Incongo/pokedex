@@ -6,7 +6,16 @@ async function loadFragment(id, file) {
   if (id === "header") {
     const searchInput = document.getElementById("search");
     const searchBtn = document.getElementById("searchBtn");
+    const inicioBtn = document.getElementById("iniciobtn");
 
+    // Botón de inicio
+    if (inicioBtn) {
+      inicioBtn.addEventListener("click", () => {
+        window.location.href = "index.html";
+      });
+    }
+
+    // Buscador
     function buscarPokemon() {
       const nombre = (searchInput.value || "").trim().toLowerCase();
       if (nombre) {
@@ -20,6 +29,7 @@ async function loadFragment(id, file) {
     });
   }
 }
+
 
 // Cargar header y footer
 loadFragment("header", "header.html");
@@ -152,6 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
     lastBtn.onclick = () => cargarPokemons(totalPages);
     container.appendChild(lastBtn);
   }
+
+  
 
   // 👉 Cargar primera página al inicio
   cargarPokemons(1);
