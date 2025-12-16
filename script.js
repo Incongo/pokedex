@@ -30,7 +30,6 @@ async function loadFragment(id, file) {
   }
 }
 
-
 // Cargar header y footer
 loadFragment("header", "header.html");
 loadFragment("footer", "footer.html");
@@ -69,21 +68,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const card = document.createElement("div");
     card.className = `card ${tipoPrincipal}`;
+
+    // ID único para aplicar transformaciones al ::before
+    card.dataset.id = crypto.randomUUID();
+
     card.innerHTML = `
-    <div class="card-header">
-      <h3>${capitalize(info.name)}</h3>
-    </div>
-    <div class="card-body">
-      <img src="${imagen}" alt="${info.name}">
-    </div>
-    <div class="card-footer">
-      <span class="${claseIcono}"></span>
-      
-    </div>
-  `;
+      <div class="card-header">
+        <h3>${capitalize(info.name)}</h3>
+      </div>
+      <div class="card-body">
+        <img src="${imagen}" alt="${info.name}">
+      </div>
+      <div class="card-footer">
+        <span class="${claseIcono}"></span>
+      </div>
+    `;
+
+    // Solo rotaciones compatibles con textura rectangular
+    const rotations = ["0deg", "180deg"];
+
+    // Solo volteos horizontales (no tocamos la proporción vertical)
+    const flips = ["scaleX(1)", "scaleX(-1)"];
+
+    const randomRotation =
+      rotations[Math.floor(Math.random() * rotations.length)];
+    const randomFlip = flips[Math.floor(Math.random() * flips.length)];
+
+    // Creamos un estilo dinámico para el ::before de esta carta
+    const style = document.createElement("style");
+    style.innerHTML = `
+      .card[data-id="${card.dataset.id}"]::before {
+          transform: ${randomFlip} rotate(${randomRotation});
+      }
+    `;
+    document.head.appendChild(style);
+
     card.addEventListener("click", () => {
       window.location.href = `pokemon.html?name=${info.name}`;
     });
+
     return card;
   }
 
@@ -162,8 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
     lastBtn.onclick = () => cargarPokemons(totalPages);
     container.appendChild(lastBtn);
   }
-
-  
 
   // 👉 Cargar primera página al inicio
   cargarPokemons(1);
