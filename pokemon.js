@@ -141,14 +141,39 @@ async function cargarPokemon() {
             pointBackgroundColor: colores.point,
             pointBorderColor: colores.border,
             borderWidth: 2,
+            borderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 10,
+            backgroundColor: colores.bg.replace("0.25", "0.35"),
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { r: { beginAtZero: true } },
-        plugins: { legend: { display: true } },
+        scales: {
+          r: {
+            beginAtZero: true,
+            grid: {
+              color: "rgba(0,0,0,0.25)",
+              lineWidth: 2,
+            },
+            angleLines: {
+              color: colores.border,
+              lineWidth: 2,
+            },
+            pointLabels: {
+              color: "#222",
+              font: { size: 14, weight: "bold" },
+            },
+            ticks: {
+              display: false,
+            },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
       },
     });
 
