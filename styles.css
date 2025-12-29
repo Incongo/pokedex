@@ -460,6 +460,203 @@ th {
     background-color: #f4f4f4;
 }
 
+
+.card.fire {
+    --glow-color: rgba(255, 87, 34, 0.7);
+}
+
+.card.water {
+    --glow-color: rgba(33, 150, 243, 0.7);
+}
+
+.card.electric {
+    --glow-color: rgba(251, 192, 45, 0.7);
+}
+
+.card.grass {
+    --glow-color: rgba(76, 175, 80, 0.7);
+}
+
+.card.psychic {
+    --glow-color: rgba(233, 30, 99, 0.7);
+}
+
+.card.rock {
+    --glow-color: rgba(121, 85, 72, 0.7);
+}
+
+.card.ground {
+    --glow-color: rgba(161, 136, 127, 0.7);
+}
+
+.card.ice {
+    --glow-color: rgba(0, 188, 212, 0.7);
+}
+
+.card.dragon {
+    --glow-color: rgba(103, 58, 183, 0.7);
+}
+
+.card.dark {
+    --glow-color: rgba(0, 0, 0, 0.8);
+}
+
+.card.fairy {
+    --glow-color: rgba(244, 143, 177, 0.7);
+}
+
+.card.normal {
+    --glow-color: rgba(120, 144, 156, 0.7);
+}
+
+.card.fighting {
+    --glow-color: rgba(211, 47, 47, 0.7);
+}
+
+.card.poison {
+    --glow-color: rgba(156, 39, 176, 0.7);
+}
+
+.card.bug {
+    --glow-color: rgba(139, 195, 74, 0.7);
+}
+
+.card.ghost {
+    --glow-color: rgba(96, 125, 139, 0.7);
+}
+
+.card.steel {
+    --glow-color: rgba(158, 158, 158, 0.7);
+}
+
+.card.flying {
+    --glow-color: rgba(100, 181, 246, 0.7);
+}
+
+
+
+
+@keyframes typeGlow {
+    0% {
+        box-shadow: 0 0 14px var(--glow-color);
+    }
+
+    50% {
+        box-shadow: 0 0 22px var(--glow-color);
+    }
+
+    100% {
+        box-shadow: 0 0 14px var(--glow-color);
+    }
+}
+
+.card {
+    --glow-color: rgba(255, 255, 255, 0.4);
+    /* valor por defecto */
+    animation: typeGlow 4s ease-in-out infinite;
+}
+
+
+
+@keyframes foilShimmer {
+    0% {
+        opacity: 0.45;
+        transform: translateX(0) translateY(0);
+    }
+
+    50% {
+        opacity: 0.65;
+        transform: translateX(8px) translateY(-8px);
+    }
+
+    100% {
+        opacity: 0.45;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+.card::before {
+    animation: foilShimmer 6s ease-in-out infinite;
+}
+
+.card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: perspective(600px) rotateX(6deg) rotateY(-6deg) scale(1.05);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* NUEVO — Animación foil shimmer */
+@keyframes foilShimmer {
+    0% {
+        opacity: 0.45;
+        transform: translateX(0) translateY(0);
+    }
+
+    50% {
+        opacity: 0.65;
+        transform: translateX(8px) translateY(-8px);
+    }
+
+    100% {
+        opacity: 0.45;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+/* Aplicación a la textura holográfica */
+.card::before {
+    animation: foilShimmer 6s ease-in-out infinite;
+}
+
+/* NUEVO — Parallax suave estilo carta TCG */
+.card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: perspective(600px) rotateX(6deg) rotateY(-6deg) scale(1.05);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* NUEVO — Glow dinámico según tipo */
+@keyframes typeGlow {
+    0% {
+        box-shadow: 0 0 14px var(--glow-color);
+    }
+
+    50% {
+        box-shadow: 0 0 22px var(--glow-color);
+    }
+
+    100% {
+        box-shadow: 0 0 14px var(--glow-color);
+    }
+}
+
+.card {
+    animation: typeGlow 4s ease-in-out infinite;
+}
+
+/* NUEVO — Animación suave para la tarjeta grande */
+#pokemon {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+
+
+/* NUEVO — Fondo suave para el radar */
+#statsChart {
+    background: radial-gradient(circle, #ffffffaa, #ddddddaa);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+
+
+
 /* ====== HEADER y FOOTER ====== */
 header {
     background: linear-gradient(#ef5350ef, #0f0505ef);
